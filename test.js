@@ -1,4 +1,3 @@
-/* istanbul ignore next */
 describe('tolkien', function () {
   'use strict';
 
@@ -79,6 +78,50 @@ describe('tolkien', function () {
       tolkien.service('foo', function () {})
              .service('bar', function () {})
              .service('baz', function () {});
+    });
+  });
+
+  describe('#login', function () {
+    it('calls with error if no services are configured', function (next) {
+      tolkien.login({}, function (err) {
+        assume(err.message).includes('No');
+        assume(err.message).includes('service');
+        assume(err.message).includes('.');
+
+        next();
+      });
+    });
+
+    it('calls with error if service key is missing', function (next) {
+      tolkien.service('foo', function () {});
+      tolkien.login({ id: 'foo' }, function (err) {
+        assume(err.message).includes('Missing');
+        assume(err.message).includes('service');
+        assume(err.message).includes('.');
+
+        next();
+      });
+    });
+
+    it('calls with error if id is missing', function (next) {
+      tolkien.service('foo', function () {});
+      tolkien.login({ service: 'foo' }, function (err) {
+        assume(err.message).includes('Missing user id');
+        assume(err.message).includes('.');
+
+        next();
+      });
+    });
+
+    it('calls with error if unknown service is selected', function (next) {
+      tolkien.service('foo', function () {});
+      tolkien.login({ service: 'bar', id: '1313' }, function (err) {
+        assume(err.message).includes('unknown');
+        assume(err.message).includes('service');
+        assume(err.message).includes('.');
+
+        next();
+      });
     });
   });
 

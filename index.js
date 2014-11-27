@@ -53,13 +53,13 @@ Tolkien.prototype.login = function login(data, fn) {
     , err;
 
   if (!Object.keys(this.services).length) {
-    err = new Error('All authentication services are currently offline.');
-  } if (!id) {
-    err = new Error('Missing user id, cannot generate a token');
+    err = new Error('No authentication service configured.');
+  } else if (!id) {
+    err = new Error('Missing user id, cannot generate a token.');
   } else if (!data.service) {
     err = new Error('Missing authentication service id.');
   } else if (!service) {
-    err = new Error('Invalid or unkown authentication service selected.');
+    err = new Error('Invalid or unknown authentication service selected.');
   }
 
   if (err) setImmediate(fn.bind(fn, err));
