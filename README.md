@@ -1,5 +1,12 @@
 # tolkien
 
+[![Version npm][version]](http://browsenpm.org/package/tolkien)[![Build Status][build]](https://travis-ci.org/observing/tolkien)[![Dependencies][david]](https://david-dm.org/observing/tolkien)[![Coverage Status][cover]](https://coveralls.io/r/observing/tolkien?branch=master)
+
+[version]: http://img.shields.io/npm/v/tolkien.svg?style=flat-square
+[build]: http://img.shields.io/travis/observing/tolkien/master.svg?style=flat-square
+[david]: https://img.shields.io/david/observing/tolkien.svg?style=flat-square
+[cover]: http://img.shields.io/coveralls/observing/tolkien/master.svg?style=flat-square
+
 ## Installation
 
 ```
