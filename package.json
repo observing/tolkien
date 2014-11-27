@@ -1,0 +1,48 @@
+{
+  "name": "tolkien",
+  "version": "0.0.0",
+  "description": "Password less accounts which uses one time tokens for access.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --reporter spec --ui bdd test.js",
+    "watch": "mocha --watch --reporter spec --ui bdd test.js",
+    "coverage": "istanbul cover ./node_modules/.bin/_mocha -- --reporter spec --ui bdd test.js",
+    "test-travis": "istanbul cover node_modules/.bin/_mocha --report lcovonly -- --reporter spec --ui bdd test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/observing/tolkien"
+  },
+  "keywords": [
+    "tolkien",
+    "you",
+    "shall",
+    "not",
+    "pass",
+    "gandalf",
+    "password",
+    "account",
+    "passwordless",
+    "nopass",
+    "authentication",
+    "auth"
+  ],
+  "author": "Arnout Kazemier",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/observing/tolkien/issues"
+  },
+  "homepage": "https://github.com/observing/tolkien",
+  "dependencies": {
+    "bs58": "2.0.x",
+    "dynamis": "0.1.x",
+    "extendible": "0.1.x",
+    "ms": "0.7.x"
+  },
+  "devDependencies": {
+    "assume": "0.0.x",
+    "istanbul": "0.3.x",
+    "mocha": "2.0.x",
+    "pre-commit": "0.0.x"
+  }
+}
