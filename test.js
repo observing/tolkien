@@ -1,3 +1,4 @@
+/* istanbul ignore next */
 describe('tolkien', function () {
   'use strict';
 
