@@ -57,7 +57,7 @@ Tolkien.prototype.login = function login(data, fn) {
   } else if (!id) {
     err = new Error('Missing user id, cannot generate a token.');
   } else if (!data.service) {
-    err = new Error('Missing authentication service id.');
+    err = new Error('Missing authentication service.');
   } else if (!service) {
     err = new Error('Invalid or unknown authentication service selected.');
   }
