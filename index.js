@@ -74,7 +74,7 @@ Tolkien.prototype.login = function login(data, fn) {
       if (err) return fn(err);
 
       data.token = token;
-      tolkien.set(data, service.expiree, function stored(err) {
+      tolkien.set(data, service.expire, function stored(err) {
         if (err) return fn(err);
 
         service.send(data, fn);
@@ -99,14 +99,14 @@ Tolkien.prototype.validate = function validate(data, fn) {
     , err;
 
   if (!data.token) {
-    err = new Error('Missing token, cannot validate request');
+    err = new Error('Missing token, cannot validate request.');
   } else if (!data.id) {
-    err = new Error('Missing user id, cannot validate token');
+    err = new Error('Missing user id, cannot validate token.');
   }
 
   if (err) setImmediate(fn.bind(fn, err));
-  else this.get(ns + data.id, function get(err, result) {
-    if (err) return fn(err, false, data);
+  else this.get(data, function get(err, result) {
+    if (err || !result) return fn(err, false, data);
 
     //
     // The get method returns the id belongs to the token or the token that
@@ -118,7 +118,7 @@ Tolkien.prototype.validate = function validate(data, fn) {
     var validates = data.token === result.token && data.id === result.id;
     if (!validates) return fn(err, validates, data);
 
-    tolkien.store.del(ns + data.id, function deleted(err) {
+    tolkien.remove(data, function deleted(err) {
       fn(err, validates, data);
     });
   });
@@ -199,8 +199,8 @@ Tolkien.prototype.remove = function remove(data, fn) {
     if (++calls === 2) fn(errors.pop(), data);
   }
 
-  this.store.del(ns +'token:'+ data.token, data.id, next);
-  this.store.del(ns +'id:'+ data.id, data.token, next);
+  this.store.del(ns +'token:'+ data.token, next);
+  this.store.del(ns +'id:'+ data.id, next);
 
   return this;
 };
@@ -232,6 +232,7 @@ Tolkien.prototype.service = function service(name, fn, options) {
   }
 
   this.services[name] = {
+    expire: options.expire || this.expiree,
     size: size,
     type: type,
     send: fn

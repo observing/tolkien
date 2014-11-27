@@ -189,6 +189,76 @@ describe('tolkien', function () {
     });
   });
 
+  describe('#validate', function () {
+    it('requires a token in the data', function (next) {
+      tolkien.service('foo', function () {});
+      tolkien.validate({ id: 'hi' }, function (err) {
+        assume(err.message).contains('Missing token');
+
+        next();
+      });
+    });
+
+    it('requires a user in the data', function (next) {
+      tolkien.service('foo', function () {});
+      tolkien.validate({ token: 'hi' }, function (err) {
+        assume(err.message).contains('Missing user');
+
+        next();
+      });
+    });
+
+    it('does not validate when we dont have any data', function (next) {
+      tolkien.service('foo', function () {});
+      tolkien.validate({ id: 'a', token: 'b' }, function (err, valid, data) {
+        if (err) return next(err);
+
+        assume(valid).is.false();
+        assume(data.id).equals('a');
+        assume(data.token).equals('b');
+
+        next();
+      });
+    });
+
+    it('has validates if the token equals stored token', function (next) {
+      tolkien.service('foo', function () {});
+      tolkien.set({ id: 'one', token: 'two' }, 100, function () {
+        tolkien.validate({ id: 'one', token: 'three' }, function (err, valid, data) {
+          if (err) return next(err);
+
+          assume(valid).is.false();
+          assume(data.id).equals('one');
+          assume(data.token).equals('three');
+
+          next();
+        });
+      });
+    });
+
+    it('validates if the token is valid', function (next) {
+      tolkien.service('foo', function () {});
+      tolkien.set({ id: 'two', token: 'four' }, 1000, function (err) {
+        if (err) return next(err);
+
+        tolkien.validate({ id: 'two', token: 'four' }, function (err, valid, data) {
+          if (err) return next(err);
+
+          assume(valid).is.true();
+          assume(data.id).equals('two');
+          assume(data.token).equals('four');
+
+          tolkien.get(data, function (err, res) {
+            assume(err).is.a('undefined');
+            assume(res).is.a('undefined');
+
+            next();
+          });
+        });
+      });
+    });
+  });
+
   describe('#token', function () {
     it('generates a string', function (next) {
       tolkien.token(10, function (err, token) {
