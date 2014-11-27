@@ -8,3 +8,5 @@ script:
   - "npm run test-travis"
 after_script:
   - "npm install coveralls@2.11.x && cat coverage/lcov.info | coveralls"
+services:
+  - "redis-server"

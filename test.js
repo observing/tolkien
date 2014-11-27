@@ -23,6 +23,14 @@ describe('tolkien', function () {
     assume(Tolkien({ store: memory })).is.instanceOf(Tolkien);
   });
 
+  it('accepts a redis store through dynamis', function () {
+    tolkien = new Tolkien({
+      type: 'redis',
+      client: require('redis').createClient(),
+      database: 'tokens'
+    });
+  });
+
   it('can be extended', function () {
     assume(Tolkien.extend).is.a('function');
 
