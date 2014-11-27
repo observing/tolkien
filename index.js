@@ -52,7 +52,7 @@ Tolkien.prototype.login = function login(data, fn) {
     , id = data.id
     , err;
 
-  if (!Object.keys(this.services).length) {
+  if (!Object.keys(tolkien.services).length) {
     err = new Error('No authentication service configured.');
   } else if (!id) {
     err = new Error('Missing user id, cannot generate a token.');
@@ -63,23 +63,26 @@ Tolkien.prototype.login = function login(data, fn) {
   }
 
   if (err) setImmediate(fn.bind(fn, err));
-  else this.store.get(ns + id, function get(err, token) {
-    if (!err && !data) err = new Error('Please wait until your old token expires.');
+  else tolkien.get(data, function get(err, result) {
+    if (!err && result) {
+      err = new Error('Please wait until the old token expires.');
+    }
+
     if (err) return fn(err);
 
     tolkien[service.type](service.size, function generated(err, token) {
       if (err) return fn(err);
 
-      tolkien.store.set(ns + id, token, tolkien.expiree, function stored(err) {
+      data.token = token;
+      tolkien.set(data, service.expiree, function stored(err) {
         if (err) return fn(err);
 
-        data.token = token;
         service.send(data, fn);
       });
     });
   });
 
-  return this;
+  return tolkien;
 };
 
 /**
@@ -102,15 +105,102 @@ Tolkien.prototype.validate = function validate(data, fn) {
   }
 
   if (err) setImmediate(fn.bind(fn, err));
-  else this.store.get(ns + data.id, function get(err, token) {
-    if (err || !token) return fn(err, false, data);
+  else this.get(ns + data.id, function get(err, result) {
+    if (err) return fn(err, false, data);
 
-    var validates = data.token === token;
+    //
+    // The get method returns the id belongs to the token or the token that
+    // belongs to our given id so we need to check if both are the same in order
+    // to confirm a validated id and token match. If it's invalid we don't need
+    // to delete tokens as they will auto expire and we don't want to remove the
+    // wrong id or token.
+    //
+    var validates = data.token === result.token && data.id === result.id;
+    if (!validates) return fn(err, validates, data);
 
     tolkien.store.del(ns + data.id, function deleted(err) {
       fn(err, validates, data);
     });
   });
+
+  return this;
+};
+
+/**
+ * Get the token that belongs to the id or the id that belongs to the token.
+ *
+ * @param {Object} data Data object which has the user id or token.
+ * @param {Function} fn Completion callback.
+ * @returns {Tolkien}
+ * @api public
+ */
+Tolkien.prototype.get = function get(data, fn) {
+  var result = {};
+
+  if (data.token) result.token = data.token;
+  if (data.id) result.id = data.id;
+
+  if (data.id) this.store.get(this.ns +'id:'+ data.id, function get(err, token) {
+    if (!token) return fn();
+
+    result.token = token;
+    fn(err, result);
+  });
+
+  else this.store.get(this.ns + 'token:'+ data.token, function get(err, id) {
+    if (!id) return fn();
+
+    result.id = id;
+    fn(err, result);
+  });
+
+  return this;
+};
+
+/**
+ * Store the token and the id in the supplied store.
+ *
+ * @param {Object} data Data object which has the user id or token.
+ * @param {Function} fn Completion callback.
+ * @returns {Tolkien}
+ * @api public
+ */
+Tolkien.prototype.set = function set(data, expire, fn) {
+  var ns = this.ns
+    , errors = []
+    , calls = 0;
+
+  function next(err) {
+    if (err) errors.push(err);
+    if (++calls === 2) fn(errors.pop(), data);
+  }
+
+  this.store.set(ns +'token:'+ data.token, data.id, expire, next);
+  this.store.set(ns +'id:'+ data.id, data.token, expire, next);
+
+  return this;
+};
+
+/**
+ * Remove token and id from the store.
+ *
+ * @param {Object} data Data object which has the user id or token.
+ * @param {Function} fn Completion callback.
+ * @returns {Tolkien}
+ * @api public
+ */
+Tolkien.prototype.remove = function remove(data, fn) {
+  var ns = this.ns
+    , errors = []
+    , calls = 0;
+
+  function next(err) {
+    if (err) errors.push(err);
+    if (++calls === 2) fn(errors.pop(), data);
+  }
+
+  this.store.del(ns +'token:'+ data.token, data.id, next);
+  this.store.del(ns +'id:'+ data.id, data.token, next);
 
   return this;
 };

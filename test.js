@@ -81,6 +81,38 @@ describe('tolkien', function () {
     });
   });
 
+  describe('#set, #get', function () {
+    it('stores the date twice', function (next) {
+      tolkien.set({ id: 'foo', token: 'bar' }, 10, next);
+    });
+
+    it('can be retrieved', function (next) {
+      var data = { id: 'hello', token: 'world' };
+      tolkien.set(data, 100, function (err, data) {
+        if (err) return next(err);
+
+        assume(data.token).equals('world');
+        assume(data.id).equals('hello');
+
+        tolkien.get({ id: 'hello' }, function (err) {
+          if (err) return next(err);
+
+          assume(data.token).equals('world');
+          assume(data.id).equals('hello');
+
+          tolkien.get({ token: 'world' }, function (err) {
+            if (err) return next(err);
+
+            assume(data.token).equals('world');
+            assume(data.id).equals('hello');
+
+            next();
+          });
+        });
+      });
+    });
+  });
+
   describe('#login', function () {
     it('calls with error if no services are configured', function (next) {
       tolkien.login({}, function (err) {
@@ -122,6 +154,38 @@ describe('tolkien', function () {
 
         next();
       });
+    });
+
+    it('does not allow creation of tokens if token is pending', function (next) {
+      tolkien.service('foo', function () {});
+
+      var data = { id: 'afadafafds', service: 'foo' };
+
+      // Add a "token" to the database
+      tolkien.set({ id: data.id, token: 'bar' }, 100, function (err) {
+        if (err) return next(err);
+
+        tolkien.login(data, function (err) {
+          assume(err.message).contains('expires');
+
+          next();
+        });
+      });
+    });
+
+    it('calls the callback of the selected service with the supplied data', function (next) {
+      tolkien.service('foo', function (data, fn) {
+        assume(data).is.a('object');
+        assume(fn).is.a('function');
+
+        assume(data.service).equals('foo');
+        assume(data.id).equals('user-id');
+        assume(data.token).is.a('string');
+
+        fn();
+      });
+
+      tolkien.login({ service: 'foo', id: 'user-id' }, next);
     });
   });
 
