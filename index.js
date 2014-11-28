@@ -1,9 +1,9 @@
 'use strict';
 
 var Dynamis = require('dynamis')
+  , ms = require('millisecond')
   , crypto = require('crypto')
-  , bs58 = require('bs58')
-  , ms = require('ms');
+  , bs58 = require('bs58');
 
 /**
  * Tolkien is a authentication system that allows users to login to your system
@@ -28,7 +28,7 @@ function Tolkien(options) {
   options = options || {};
 
   this.store = options.store || new Dynamis(options.type, options.client, options);
-  this.expire = ms((options.expire || '5 minutes').toString());
+  this.expire = ms(options.expire || '5 minutes');
   this.ns = options.namespace || 'tolkien:';
   this.ratelimit = options.ratelimit || 3;
   this.services = Object.create(null);
@@ -232,7 +232,7 @@ Tolkien.prototype.service = function service(name, fn, options) {
   }
 
   this.services[name] = {
-    expire: ms((options.expire || this.expire).toString()),
+    expire: ms(options.expire || this.expire),
     size: size,
     type: type,
     send: fn

@@ -37,7 +37,7 @@
     "bs58": "2.0.x",
     "dynamis": "0.1.x",
     "extendible": "0.1.x",
-    "ms": "0.7.x"
+    "millisecond": "0.0.x"
   },
   "devDependencies": {
     "assume": "0.0.x",
