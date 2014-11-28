@@ -75,6 +75,11 @@ Tolkien.prototype.login = function login(data, fn) {
 
       data.token = token;
       tolkien.set(data, service.expire, function stored(err) {
+        //
+        // @TODO we might want to remove the token if the operation failed to
+        // ensure that we leave no "dead" tokens behind making it unable to
+        // login because of a pending token.
+        //
         if (err) return fn(err);
 
         service.send(data, fn);
@@ -132,7 +137,7 @@ Tolkien.prototype.validate = function validate(data, fn) {
  * @param {Object} data Data object which has the user id or token.
  * @param {Function} fn Completion callback.
  * @returns {Tolkien}
- * @api public
+ * @api private
  */
 Tolkien.prototype.get = function get(data, fn) {
   var result = {};
@@ -163,7 +168,7 @@ Tolkien.prototype.get = function get(data, fn) {
  * @param {Object} data Data object which has the user id or token.
  * @param {Function} fn Completion callback.
  * @returns {Tolkien}
- * @api public
+ * @api private
  */
 Tolkien.prototype.set = function set(data, expire, fn) {
   var ns = this.ns
@@ -187,7 +192,7 @@ Tolkien.prototype.set = function set(data, expire, fn) {
  * @param {Object} data Data object which has the user id or token.
  * @param {Function} fn Completion callback.
  * @returns {Tolkien}
- * @api public
+ * @api private
  */
 Tolkien.prototype.remove = function remove(data, fn) {
   var ns = this.ns
