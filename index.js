@@ -222,6 +222,8 @@ Tolkien.prototype.remove = function remove(data, fn) {
  * @param {String} name Name of service.
  * @param {Function} fn Callback for token and user information for sending.
  * @param {Object} options Additional configuration for your service.
+ * @returns {Tolkien}
+ * @api public
  */
 Tolkien.prototype.service = function service(name, fn, options) {
   options = options || {};
