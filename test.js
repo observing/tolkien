@@ -97,6 +97,7 @@ describe('tolkien', function () {
 
     it('can be retrieved', function (next) {
       var data = { id: 'hello', token: 'world' };
+
       tolkien.set(data, 100, function (err, data) {
         if (err) return next(err);
 
@@ -116,6 +117,63 @@ describe('tolkien', function () {
             assume(data.id).equals('hello');
 
             next();
+          });
+        });
+      });
+    });
+
+    it('stores duplicate entries for user and token lookup', function (next) {
+      var data = { id: 'get', token: 'set' };
+
+      tolkien.set(data, 100, function (err, data) {
+        if (err) return next(err);
+
+        assume(data.token).equals('set');
+        assume(data.id).equals('get');
+
+        var token = tolkien.ns + 'token:set'
+          , id = tolkien.ns + 'id:get';
+
+        tolkien.store.get(token, function (err, user) {
+          if (err) return next(err);
+
+          assume(user).equals('get');
+
+          tolkien.store.get(id, function (err, toki) {
+            if (err) return next(err);
+            assume(toki).equals('set');
+
+            next();
+          });
+        });
+      });
+    });
+  });
+
+  describe('#remove', function () {
+    it('removes both the id and token entries', function (next) {
+      var data = { id: 'haai', token: 'baii' };
+
+      tolkien.set(data, 100, function (err) {
+        if (err) return next(err);
+
+        var token = tolkien.ns + 'token:baii'
+          , id = tolkien.ns + 'id:haai';
+
+        tolkien.remove(data, function (err) {
+          if (err) return next(err);
+
+          tolkien.store.get(token, function (err, user) {
+            if (err) return next(err);
+
+            assume(user).is.a('undefined');
+
+            tolkien.store.get(id, function (err, toki) {
+              if (err) return next(err);
+              assume(toki).is.a('undefined');
+
+              next();
+            });
           });
         });
       });
