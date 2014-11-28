@@ -44,6 +44,12 @@ describe('tolkien', function () {
     assume(new Token({ store: memory })).is.instanceOf(Token);
   });
 
+  it('accepts strings are expire value', function () {
+    tolkien = new Tolkien({ store: memory, expire: '1 second' });
+
+    assume(tolkien.expire).equals(1000);
+  });
+
   describe('#service', function () {
     it('adds a new service', function () {
       assume('foo' in tolkien.services).is.false();
@@ -61,6 +67,7 @@ describe('tolkien', function () {
       var service = tolkien.services.foo;
 
       assume(service.type).equals('token');
+      assume(service.expire).equals(tolkien.expire);
     });
 
     it('throws on unknown types', function (next) {
@@ -87,6 +94,15 @@ describe('tolkien', function () {
       tolkien.service('foo', function () {})
              .service('bar', function () {})
              .service('baz', function () {});
+    });
+
+    it('allows a custom expire', function () {
+      tolkien.service('foo', function () {}, { expire: '3 minutes' });
+
+      var service = tolkien.services.foo;
+
+      assume(service.type).equals('token');
+      assume(service.expire).equals(180000);
     });
   });
 

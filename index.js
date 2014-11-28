@@ -15,7 +15,7 @@ var Dynamis = require('dynamis')
  *   one from the options.
  * - type: Type of store to generate (redis, memcached, couchdb).
  * - client: Reference to the created store client.
- * - expiree: Expire time of a generated token.
+ * - expire: Expire time of a generated token.
  * - namespace: Prefix the keys that we add.
  *
  * @constructor
@@ -28,7 +28,7 @@ function Tolkien(options) {
   options = options || {};
 
   this.store = options.store || new Dynamis(options.type, options.client, options);
-  this.expiree = ms(options.expiree || '5 minutes');
+  this.expire = ms((options.expire || '5 minutes').toString());
   this.ns = options.namespace || 'tolkien:';
   this.ratelimit = options.ratelimit || 3;
   this.services = Object.create(null);
@@ -232,7 +232,7 @@ Tolkien.prototype.service = function service(name, fn, options) {
   }
 
   this.services[name] = {
-    expire: options.expire || this.expiree,
+    expire: ms((options.expire || this.expire).toString()),
     size: size,
     type: type,
     send: fn
