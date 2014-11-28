@@ -57,7 +57,8 @@ module.exports = {
   },
 
   /**
-   * Reset the data layer.
+   * Reset the data layer, this is method is only used for testing not part of
+   * the actual store interface requirement.
    *
    * @api public
    */
