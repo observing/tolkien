@@ -82,7 +82,10 @@ Tolkien.prototype.login = function login(data, fn) {
         //
         if (err) return fn(err);
 
-        service.send(data, fn);
+        service.send(data, function reply(err, response) {
+          data.response = response;
+          fn(err, data);
+        });
       });
     });
   });

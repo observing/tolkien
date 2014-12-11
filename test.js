@@ -270,6 +270,29 @@ describe('tolkien', function () {
 
       tolkien.login({ service: 'foo', id: 'user-id' }, next);
     });
+
+    it('receives the generated tokens and supplied data as argument', function (next) {
+      tolkien.service('foo', function (data, fn) {
+        assume(data).is.a('object');
+        assume(fn).is.a('function');
+
+        assume(data.service).equals('foo');
+        assume(data.id).equals('user-id');
+        assume(data.token).is.a('string');
+        data.foo = 'bar';
+
+        fn(undefined, 'response lol');
+      });
+
+      tolkien.login({ service: 'foo', id: 'user-id' }, function (err, data) {
+        assume(data.service).equals('foo');
+        assume(data.token).is.a('string');
+        assume(data.id).equals('user-id');
+        assume(data.response).equals('response lol');
+
+        next();
+      });
+    });
   });
 
   describe('#validate', function () {
