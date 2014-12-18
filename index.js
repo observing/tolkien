@@ -183,8 +183,11 @@ Tolkien.prototype.set = function set(data, expire, fn) {
     if (++calls === 2) fn(errors.pop(), data);
   }
 
-  this.store.set(ns +'token:'+ data.token, data.id, expire, next);
-  this.store.set(ns +'id:'+ data.id, data.token, expire, next);
+  //
+  // We need to transform the expiree to a seconds instead of milliseconds.
+  //
+  this.store.set(ns +'token:'+ data.token, data.id, expire / 1000, next);
+  this.store.set(ns +'id:'+ data.id, data.token, expire / 1000, next);
 
   return this;
 };
