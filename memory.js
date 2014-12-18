@@ -40,7 +40,7 @@ module.exports = {
     setTimeout(fn, 0);
     setTimeout(function tick() {
       delete data[key];
-    }, expire);
+    }, expire * 1000);
   },
 
   /**
