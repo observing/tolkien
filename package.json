@@ -1,6 +1,6 @@
 {
   "name": "tolkien",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Password less accounts which uses one time tokens for access.",
   "main": "index.js",
   "scripts": {
