@@ -327,6 +327,23 @@ describe('tolkien', function () {
       });
     });
 
+    it('does not validate if the token expired', function (next) {
+      tolkien.service('foo', function () {});
+      tolkien.set({ id: 'a', token: 'b' }, 1, function () {
+        setTimeout(function () {
+          tolkien.validate({ id: 'a', token: 'b' }, function (err, valid, data) {
+            if (err) return next(err);
+
+            assume(valid).is.false();
+            assume(data.id).equals('a');
+            assume(data.token).equals('b');
+
+            next();
+          });
+        }, 1200);
+      });
+    });
+
     it('has validates if the token equals stored token', function (next) {
       tolkien.service('foo', function () {});
       tolkien.set({ id: 'one', token: 'two' }, 100, function () {
