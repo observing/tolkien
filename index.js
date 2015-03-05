@@ -49,13 +49,10 @@ Tolkien.prototype.login = function login(data, fn) {
   var service = this.services[data.service]
     , tolkien = this
     , ns = this.ns
-    , id = data.id
     , err;
 
   if (!Object.keys(tolkien.services).length) {
     err = new Error('No authentication service configured.');
-  } else if (!id) {
-    err = new Error('Missing user id, cannot generate a token.');
   } else if (!data.service) {
     err = new Error('Missing authentication service.');
   } else if (!service) {
@@ -108,8 +105,6 @@ Tolkien.prototype.validate = function validate(data, fn) {
 
   if (!data.token) {
     err = new Error('Missing token, cannot validate request.');
-  } else if (!data.id) {
-    err = new Error('Missing user id, cannot validate token.');
   }
 
   if (err) setImmediate(fn.bind(fn, err));
@@ -123,7 +118,7 @@ Tolkien.prototype.validate = function validate(data, fn) {
     // to delete tokens as they will auto expire and we don't want to remove the
     // wrong id or token.
     //
-    var validates = data.token === result.token && data.id === result.id;
+    var validates = data.token === result.token;
     if (!validates) return fn(err, validates, data);
 
     tolkien.remove(data, function deleted(err) {
@@ -143,22 +138,12 @@ Tolkien.prototype.validate = function validate(data, fn) {
  * @api private
  */
 Tolkien.prototype.get = function get(data, fn) {
-  var result = {};
+  this.store.get(this.ns + 'token:'+ data.token, function get(err, result) {
+    if (err) return fn(err, result);
 
-  if (data.token) result.token = data.token;
-  if (data.id) result.id = data.id;
+    try { result = JSON.parse(result); }
+    catch (e) { err = e; }
 
-  if (data.id) this.store.get(this.ns +'id:'+ data.id, function get(err, token) {
-    if (!token) return fn();
-
-    result.token = token;
-    fn(err, result);
-  });
-
-  else this.store.get(this.ns + 'token:'+ data.token, function get(err, id) {
-    if (!id) return fn();
-
-    result.id = id;
     fn(err, result);
   });
 
@@ -174,20 +159,15 @@ Tolkien.prototype.get = function get(data, fn) {
  * @api private
  */
 Tolkien.prototype.set = function set(data, expire, fn) {
-  var ns = this.ns
-    , errors = []
-    , calls = 0;
-
-  function next(err) {
-    if (err) errors.push(err);
-    if (++calls === 2) fn(errors.pop(), data);
-  }
+  var wat = JSON.stringify(data)
+    , ns = this.ns;
 
   //
   // We need to transform the expiree to a seconds instead of milliseconds.
   //
-  this.store.set(ns +'token:'+ data.token, data.id, expire / 1000, next);
-  this.store.set(ns +'id:'+ data.id, data.token, expire / 1000, next);
+  this.store.set(ns +'token:'+ data.token, wat, expire / 1000, function pass(err) {
+    fn(err, data);
+  });
 
   return this;
 };
@@ -201,17 +181,7 @@ Tolkien.prototype.set = function set(data, expire, fn) {
  * @api private
  */
 Tolkien.prototype.remove = function remove(data, fn) {
-  var ns = this.ns
-    , errors = []
-    , calls = 0;
-
-  function next(err) {
-    if (err) errors.push(err);
-    if (++calls === 2) fn(errors.pop(), data);
-  }
-
-  this.store.del(ns +'token:'+ data.token, next);
-  this.store.del(ns +'id:'+ data.id, next);
+  this.store.del(this.ns +'token:'+ data.token, fn);
 
   return this;
 };

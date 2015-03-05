@@ -107,33 +107,25 @@ describe('tolkien', function () {
   });
 
   describe('#set, #get', function () {
-    it('stores the date twice', function (next) {
+    it('stores the data', function (next) {
       tolkien.set({ id: 'foo', token: 'bar' }, 10, next);
     });
 
     it('can be retrieved', function (next) {
-      var data = { id: 'hello', token: 'world' };
+      var data = { token: 'world' };
 
       tolkien.set(data, 100, function (err, data) {
         if (err) return next(err);
 
         assume(data.token).equals('world');
-        assume(data.id).equals('hello');
 
-        tolkien.get({ id: 'hello' }, function (err) {
+        tolkien.get({ token: 'bar' }, function (err) {
           if (err) return next(err);
 
           assume(data.token).equals('world');
-          assume(data.id).equals('hello');
+          assume(data.id).equals('foo');
 
-          tolkien.get({ token: 'world' }, function (err) {
-            if (err) return next(err);
-
-            assume(data.token).equals('world');
-            assume(data.id).equals('hello');
-
-            next();
-          });
+          next();
         });
       });
     });
