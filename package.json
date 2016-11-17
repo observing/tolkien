@@ -34,16 +34,16 @@
   },
   "homepage": "https://github.com/observing/tolkien",
   "dependencies": {
-    "bs58": "2.0.x",
-    "dynamis": "0.1.x",
+    "bs58": "~3.0.0",
+    "dynamis": "~0.3.0",
     "extendible": "0.1.x",
-    "millisecond": "0.0.x"
+    "millisecond": "~0.1.2"
   },
   "devDependencies": {
-    "assume": "1.1.x",
-    "istanbul": "0.3.x",
-    "mocha": "2.1.x",
-    "pre-commit": "0.0.x",
-    "redis": "0.12.x"
+    "assume": "~1.4.1",
+    "istanbul": "~0.4.5",
+    "mocha": "~3.1.2",
+    "pre-commit": "~1.1.3",
+    "redis": "~2.6.3"
   }
 }
