@@ -34,7 +34,7 @@
   },
   "homepage": "https://github.com/observing/tolkien",
   "dependencies": {
-    "bs58": "~3.0.0",
+    "bs58": "~4.0.0",
     "dynamis": "~0.3.0",
     "extendible": "0.1.x",
     "millisecond": "~0.1.2"
